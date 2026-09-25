@@ -13,13 +13,13 @@ if torch.cuda.is_available():
 
 print(f"Device: {device} | Seed: {SEED} | GRU-D v2")
 
-EVENTS_DIR = Path("/root/events")
-CACHE_DIR  = Path("/root/cache"); CACHE_DIR.mkdir(exist_ok=True)
+EVENTS_DIR = Path("/Users/sauban/chirp-project/data/chirp_processed")
+CACHE_DIR  = Path("/Users/sauban/chirp-project/data/chirp_processed/cache"); CACHE_DIR.mkdir(exist_ok=True)
 CACHE_PATH = CACHE_DIR/"grud_tensors.npz"
-MODEL_DIR  = Path("/root/models/baselines"); MODEL_DIR.mkdir(exist_ok=True)
+MODEL_DIR  = Path("/Users/sauban/chirp-project/data/chirp_processed/models/baselines"); MODEL_DIR.mkdir(parents=True, exist_ok=True)
 
-idx    = pd.read_parquet("/root/graphs_index_clean.parquet")
-c_clean = pd.read_parquet("/root/cohort_clean.parquet")
+idx    = pd.read_parquet("/Users/sauban/chirp-project/data/chirp_processed/graphs_index_clean.parquet")
+c_clean = pd.read_parquet("/Users/sauban/chirp-project/data/chirp_processed/cohort_clean.parquet")
 label_map = dict(zip(c_clean['stay_id'], c_clean['mortality_label']))
 
 pos = idx[idx['mortality_label']==1]; neg = idx[idx['mortality_label']==0]
@@ -47,7 +47,7 @@ else:
     print("Building tensors (vectorized)...")
     vitals=pd.read_parquet(EVENTS_DIR/"vitals.parquet")
     labs  =pd.read_parquet(EVENTS_DIR/"labs.parquet")
-    cohort=pd.read_parquet("/root/cohort_clean.parquet")[['hadm_id','stay_id']]
+    cohort=pd.read_parquet("/Users/sauban/chirp-project/data/chirp_processed/cohort_clean.parquet")[['hadm_id','stay_id']]
     labs  =labs.merge(cohort, on='hadm_id', how='inner')
     t_col='t_hours'
     v_var='name'
@@ -205,5 +205,5 @@ print(f"\nTest AUROC: {test_auc:.4f} | AUPRC: {test_ap:.4f}")
 print(f"\nGRU-D v2 Seed {SEED} complete!")
 pd.DataFrame([{'model':'GRU-D','seed':SEED,'test_auroc':test_auc,
                'test_auprc':test_ap,'n_vars':N_VARS,'n_bins':N_BINS}]).to_csv(
-    f'/root/results/baseline_grud_seed{SEED}.csv',index=False)
-print(f"Saved: /root/results/baseline_grud_seed{SEED}.csv")
+    f'/Users/sauban/chirp-project/data/chirp_processed/results/baseline_grud_seed{SEED}.csv',index=False)
+print(f"Saved: /Users/sauban/chirp-project/data/chirp_processed/results/baseline_grud_seed{SEED}.csv")

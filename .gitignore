@@ -216,3 +216,9 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+.DS_Store
+unified_run/
+*.parquet
+*.pt
+*.tgz
+predictions*/
