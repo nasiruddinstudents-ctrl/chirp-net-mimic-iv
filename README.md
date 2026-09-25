@@ -1,73 +1,30 @@
-# CHIRP-Net: Bidirectional, Timestamp-Attributed Event Graphs for ICU Mortality Prediction
+# CT-HEG / CHIRP-Net — post-48-hour ICU mortality on MIMIC-IV v3.1
 
-Code accompanying the manuscript submitted to *BMC Medical Informatics and Decision Making*:
-**"CT-HEG: A Bidirectional, Timestamp-Attributed Event Graph for ICU In-Hospital Mortality
-Prediction — An Architectural Ablation Study"**
+Code for *CT-HEG: Timestamp-Conditioned Message Passing for Post-48-Hour ICU Mortality Prediction — An Architectural Ablation Study*.
 
-## Overview
+No MIMIC-IV data or MIMIC-derived files are included. You need credentialed PhysioNet access to MIMIC-IV v3.1
+(https://physionet.org/content/mimiciv/3.1/). Do not commit data, graphs, checkpoints or per-patient predictions to this repository.
 
-This repository contains the training scripts for CHIRP-Net, three architectural ablations,
-four baseline comparators, and the calibration/ensemble evaluation script, all run on
-MIMIC-IV v3.1 (31,142 ICU stays, LOS≥48h, 13.4% in-hospital mortality).
+## Pipeline (run in order)
+| Step | Script | Output |
+|---|---|---|
+| 1 | `step01_cohort.py` | adult first ICU stay per patient, LOS >= 48 h: 31,142 stays / 31,142 patients (`cohort.parquet`) |
+| 2 | `step02_events.py` | vitals, labs and medication events within the first 48 h |
+| 3 | `step03_build_ct_heg.py` | one PyTorch Geometric `HeteroData` graph per stay (`graphs/<stay_id>.pt`) + `graphs_index.parquet` |
+| 4 | `run_queue.sh` -> `run_unified_nodx.py` | trains every CHIRP-Net condition, 5 seeds each, under one protocol; writes per-seed test predictions |
+| 5 | `paired_bootstrap.py` | paired patient-level bootstrap CIs reported in Tables 5-6 |
 
-## Contents
+Notes
+- The training script expects the step-1 and step-3 outputs under the names `cohort_clean.parquet` and `graphs_index_clean.parquet`
+  (identical content; copy or rename them).
+- Step 3 also builds diagnosis nodes; the training script removes them before use because diagnosis-code timing
+  cannot be verified at the 48-hour cutoff (see the paper's Leakage Audit).
+- The train/validation/test split (70/15/15, stratified, seed 42) and all normalization statistics are computed inside
+  `run_unified_nodx.py`; `step04_split.py` is not used for the reported results.
+- Baselines: `baseline_grud.py`, `baseline_mtand.py`, `baseline_transformer.py`, `baseline_lr_FIXED.py`.
 
-| File | Purpose |
-|---|---|
-| `train_chirp_v5.py` | Full CHIRP-Net model: 4-layer HeteroConv, GATv2Conv, bidirectional edges |
-| `ablation_no_reverse.py` | Ablation: remove reverse edges (connectivity/reachability check) |
-| `ablation_no_time.py` | Ablation: zero out timestamp edge attribute |
-| `ablation_homogeneous.py` | Ablation: collapse heterogeneous edge types into one relation |
-| `baseline_grud.py` | GRU-D baseline |
-| `baseline_mtand.py` | mTAND baseline |
-| `baseline_transformer.py` | 4-layer Transformer baseline |
-| `baseline_lr_FIXED.py` | Logistic regression baseline (corrected cohort version) |
-| `calibration_ensemble_proper.py` | Validation-fitted temperature scaling + 5-checkpoint ensemble evaluation |
-
-## Cohort
-
-Adult patients (age ≥18), first eligible ICU stay only (one stay per `subject_id`),
-LOS ≥48h. 31,142 stays; 13.4% in-hospital mortality. Cohort construction retains
-exactly one row per patient, so patient-level split disjointness is guaranteed
-by construction — verified directly against `cohort_clean.parquet`
-(31,142 rows, 31,142 unique `subject_id` values).
-
-## Reproducing Table II / III / IV
-
-All scripts read from `graphs_index_clean.parquet` and `cohort_clean.parquet`
-(the deduplicated cohort), use `random_state=42` for the 70/15/15 split, and
-train 5 seeds (42–46) unless noted as a single run (GRU-D).
-
-```bash
-# Full model, one seed
-SEED=42 python3 train_chirp_v5.py
-
-# Ablations (5 seeds each)
-for SEED in 42 43 44 45 46; do
-  SEED=$SEED python3 ablation_no_reverse.py
-  SEED=$SEED python3 ablation_no_time.py
-  SEED=$SEED python3 ablation_homogeneous.py
-done
-
-# Baselines
-python3 baseline_lr_FIXED.py
-for SEED in 42 43 44 45 46; do
-  SEED=$SEED python3 baseline_grud.py
-  SEED=$SEED python3 baseline_mtand.py
-  SEED=$SEED python3 baseline_transformer.py
-done
-
-# Calibration + ensemble (requires saved checkpoints from all 5 CHIRP-Net seeds)
-python3 calibration_ensemble_proper.py
-```
-
-## Known data-provenance note
-
-An earlier version of the logistic-regression baseline (`baseline_lr.py`, not included
-here) was trained on an un-deduplicated cohort file. `baseline_lr_FIXED.py` is the
-corrected version, reading from `graphs_index_clean.parquet`, and is what the
-manuscript's Table II figures are drawn from.
+## Environment
+PyTorch 2.x, PyTorch Geometric 2.8, scikit-learn, pandas, pyarrow. Experiments were run on a single RTX 5090.
 
 ## License
-
-BSD 3-Clause. See `LICENSE`.
+BSD-3-Clause.
