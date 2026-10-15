@@ -2,7 +2,7 @@
 
 **Article:** CT-HEG: timestamp-conditioned message passing for post-48-hour ICU mortality prediction — an architectural ablation study
 
-**Authors:** Mohammad Nasir Uddin, Rahnuma Tabassum Orpita, Asaduzzaman Anik, Eklachur Rahman Bhuiyan, Marjahan Risalat, S. M. Wali Ullah, Asif Ahamed
+**Authors:** Mohammad Nasir Uddin, Marjahan Risalat, S. M. Wali Ullah, Rahnuma Tabassum Orpita, Asaduzzaman Anik, Eklachur Rahman Bhuiyan
 
 **Study type:** Model development with internal (held-out split) evaluation (D;E)
 
@@ -34,12 +34,12 @@
 | Missing data | 11 | Handling of missing data and reasons for omission | Reported | Offline Graph Construction (no imputation; an unobserved channel contributes no node or edge) |
 | Methods: analytical methods | 12a | How data were used and partitioned for development and evaluation | Reported | Splits and Training Protocol |
 | | 12b | Handling of predictors (functional form, rescaling, transformation) | Reported | Type-Specific Input Embeddings; Time-Attentive Edge Encoding |
-| | 12c | Model type, rationale, building steps, hyperparameter tuning, internal validation | Reported | CHIRP-Net sections; Splits and Training Protocol; Table 2 (hidden size selected on validation from 80 and 192) |
+| | 12c | Model type, rationale, building steps, hyperparameter tuning, internal validation | Reported | CHIRP-Net sections; Splits and Training Protocol; Table 3 (hidden size selected on validation from 80 and 192) |
 | | 12d | Heterogeneity across clusters | N/A | Single center |
 | | 12e | Performance measures and plots, with rationale; comparison of models | Reported | Predictive Metrics and Statistical Testing; Participant Characteristics, Subgroup and Calibration Analyses |
 | | 12f | Model updating (e.g., recalibration) after evaluation | N/A | No updating or recalibration performed |
 | | 12g | How predictions were calculated for evaluation | Reported | Software availability (training and evaluation code) |
-| Class imbalance | 13 | Class-imbalance methods, rationale, and recalibration | Partial | Splits and Training Protocol (class-balanced WeightedRandomSampler); Table 2 (class-weighted logistic regression); its effect on calibration is reported (Calibration; Table 9), but no recalibration was applied |
+| Class imbalance | 13 | Class-imbalance methods, rationale, and recalibration | Partial | Splits and Training Protocol (class-balanced WeightedRandomSampler); Table 3 (class-weighted logistic regression); its effect on calibration is reported (Calibration; Table 9), but no recalibration was applied |
 | Fairness | 14 | Approaches to address model fairness | Partial | Participant Characteristics, Subgroup and Calibration Analyses; Table 8 (subgroup discrimination by sex, age, race/ethnicity and insurance). Subgroup calibration and threshold-based fairness metrics not assessed (Limitations) |
 | Model output | 15 | Form of model output and rationale for any thresholds | Reported | Readout and Prediction (predicted probability); no classification threshold used |
 | Training vs. evaluation | 16 | Differences between development and evaluation data | Reported | Splits and Training Protocol (stratified random split from the same source) |
@@ -52,11 +52,11 @@
 | | 18f | Code sharing | Reported | Software availability |
 | Patient and public involvement | 19 | Patient and public involvement | Reported | Data source, ethics and study registration (none) |
 | Results: participants | 20a | Participant flow, numbers with and without the outcome | Partial | Datasets and Cohort Definitions; Splits and Training Protocol (deaths/survivors per split); no flow diagram with exclusion counts |
-| | 20b | Participant characteristics, including predictors, outcomes, missing data, and demographic differences | Reported | Participant Characteristics; Table 7 (overall, survivors, non-survivors, test set) |
-| | 20c | Comparison of evaluation with development data distributions | Reported | Table 7 (test set compared with the full cohort); mortality per split (Splits and Training Protocol) |
+| | 20b | Participant characteristics, including predictors, outcomes, missing data, and demographic differences | Reported | Participant Characteristics; Table 2 (overall, survivors, non-survivors, test set) |
+| | 20c | Comparison of evaluation with development data distributions | Reported | Table 2 (test set compared with the full cohort); mortality per split (Splits and Training Protocol) |
 | Results: model development | 21 | Number of participants and outcome events in each analysis | Reported | Splits and Training Protocol (stays and deaths in training, validation and test sets) |
-| Results: model specification | 22 | Full model details to enable predictions and reuse | Partial | Architecture and protocol (Methods; Table 2); code (Software availability); checkpoints available on request to credentialed researchers |
-| Results: model performance | 23a | Performance estimates with confidence intervals, including key subgroups | Reported | Tables 4–6 and 8–9; Figure 2 (reliability diagram); subgroup AUROC/AUPRC with bootstrap CIs; baseline comparisons are descriptive without CIs |
+| Results: model specification | 22 | Full model details to enable predictions and reuse | Partial | Architecture and protocol (Methods; Table 3); code (Software availability); checkpoints available on request to credentialed researchers |
+| Results: model performance | 23a | Performance estimates with confidence intervals, including key subgroups | Reported | Tables 5–7 and 8–9; Figure 2 (reliability diagram); subgroup AUROC/AUPRC with bootstrap CIs; baseline comparisons are descriptive without CIs |
 | | 23b | Heterogeneity across clusters | N/A | Single center |
 | Results: model updating | 24 | Results of model updating | N/A | No updating performed |
 | Discussion: interpretation | 25 | Overall interpretation, including fairness, in light of objectives and previous studies | Reported | Discussion; Limitations (Subgroup performance and fairness) |
